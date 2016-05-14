@@ -51,6 +51,7 @@
 #include "mbedtls/ecp.h"
 #include "mbedtls/ecjpake.h"
 #include "mbedtls/timing.h"
+#include "mbedtls/retailmac.h"
 
 #include <string.h>
 
@@ -142,6 +143,17 @@ int main( int argc, char *argv[] )
 
 #if defined(MBEDTLS_SELF_TEST)
 
+
+#if defined(MBEDTLS_RETAILMAC_C) && defined(MBEDTLS_DES_C)
+    if( mbedtls_retailmac_self_test( v )  != 0 )
+    {
+        suites_failed++;
+    }
+    suites_tested++;
+#endif /* defined(MBEDTLS_RETAILMAC_C) && defined(MBEDTLS_DES_C) */
+
+#define SKIP_OTHER_TESTS
+#ifndef SKIP_OTHER_TESTS
 #if defined(MBEDTLS_MEMORY_BUFFER_ALLOC_C)
     mbedtls_memory_buffer_alloc_init( buf, sizeof(buf) );
 #endif
@@ -355,7 +367,7 @@ int main( int argc, char *argv[] )
     }
     suites_tested++;
 #endif
-
+#endif /* SKIP_OTHER_TESTS */
 #else
     mbedtls_printf( " MBEDTLS_SELF_TEST not defined.\n" );
 #endif

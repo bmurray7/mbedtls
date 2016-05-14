@@ -310,6 +310,15 @@
 //#define MBEDTLS_CAMELLIA_SMALL_MEMORY
 
 /**
+ * \def MBEDTLS_RETAILMAC_C
+ *
+ * Support Retail MAC
+ *
+ * Uncomment this macro to use less memory for Camellia.
+ */
+#define MBEDTLS_RETAILMAC_C
+
+/**
  * \def MBEDTLS_CIPHER_MODE_CBC
  *
  * Enable Cipher Block Chaining mode (CBC) for symmetric ciphers.
