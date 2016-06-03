@@ -310,13 +310,12 @@
 //#define MBEDTLS_CAMELLIA_SMALL_MEMORY
 
 /**
- * \def MBEDTLS_RETAILMAC_C
+ * \def MBEDTLS_ISO9797MAC_C
  *
- * Support Retail MAC
+ * Support MBEDTLS_ISO9797MAC (Retail MAC and CBC MAC)
  *
- * Uncomment this macro to use less memory for Camellia.
  */
-#define MBEDTLS_RETAILMAC_C
+#define MBEDTLS_ISO9797MAC_C
 
 /**
  * \def MBEDTLS_CIPHER_MODE_CBC

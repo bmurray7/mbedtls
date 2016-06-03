@@ -1,9 +1,15 @@
+/*
+ *                **** WARNING ****
+ *   This file has NOT submitted to mbedTLS upstream
+ */
+
+
 /**
- * \file cbcmac.h
+ * \file iso9797mac.h
  *
- * \brief The CBC-MAC Mode for Authentication
+ * \brief The CBC-MAC Mode and Retail Mac Modes for Authentication
  *
- *  Copyright (C) 2006-2016, ARM Limited, All Rights Reserved
+ *  Copyright (C) 2016, Clover
  *  SPDX-License-Identifier: Apache-2.0
  *
  *  Licensed under the Apache License, Version 2.0 (the "License"); you may
@@ -18,10 +24,10 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  *
- *  This file is part of mbed TLS (https://tls.mbed.org)
+ *  This file is NOT part of mbed TLS (https://tls.mbed.org)
  */
-#ifndef MBEDTLS_RETAILMAC_H
-#define MBEDTLS_RETAILMAC_H
+#ifndef MBEDTLS_ISO9797MAC_H
+#define MBEDTLS_ISO9797MAC_H
 
 #include "cipher.h"
 #include "des.h"
@@ -32,44 +38,105 @@ extern "C" {
 #endif
 
 
-#define MBEDTLS_ERR_RETAILMAC_BAD_INPUT      -0x0015 /**< Bad input parameters to function. */
-#define MBEDTLS_ERR_RETAILMAC_VERIFY_FAILED  -0x0017 /**< Verification failed. */
+#define MBEDTLS_ERR_ISO9797MAC_BAD_INPUT      -0x0015 /**< Bad input parameters to function. */
+#define MBEDTLS_ERR_ISO9797MAC_VERIFY_FAILED  -0x0017 /**< Verification failed. */
+#define MBEDTLS_ERR_ISO9797MAC_ALLOC_FAILED  -0x0019 /**< Verification failed. */
 
 
 /**
- * \brief          Retail MAC context structure
+ *  \brief  ISO 9791 Algorithm 1  MAC context structure
+ *  AKA Retail MAC
  */
 typedef struct {
 
-	mbedtls_des_context key_1_ctx;
-	mbedtls_des_context key_2_ctx;
-
+	mbedtls_cipher_context_t cipher1_ctx;
+	size_t cipher_block_size;
 }
-mbedtls_retailmac_context;
+mbedtls_is9797_cbc_mac_context;
+
+
+
+/**
+ *  \brief  ISO 9791 Algorithm 3  MAC context structure
+ *  AKA Retail MAC
+ */
+typedef struct {
+
+	mbedtls_cipher_context_t cipher1_ctx;
+	mbedtls_cipher_context_t cipher2_ctx;
+	size_t cipher_block_size;
+}
+mbedtls_is9797_retail_mac_context;
+
+
+/**
+ * \brief           Initialize  CBC-MAC context (just makes references valid)
+ *
+ * \param ctx       CBC Mac context to initialize
+ */
+void mbedtls_retailmac_init(mbedtls_is9797_retail_mac_context *ctx );
+
 
 /**
  * \brief           Initialize CBC-MAC context (just makes references valid)
- *                  Makes the context ready for mbedtls_ccm_setkey() or
- *                  mbedtls_ccm_free().
+ *
+ * \param ctx       CNC Mac context to initialize
+ */
+void mbedtls_cbcmac_init(mbedtls_is9797_cbc_mac_context *ctx );
+
+/**
+ * \brief           Initialize CBC-MAC context
  *
  * \param ctx       CBC-MAC context to initialize
  */
-void mbedtls_retailmac_init(mbedtls_retailmac_context *ctx );
+void mbedtls_retailmac_init(mbedtls_is9797_retail_mac_context *ctx );
+
 
 /**
- * \brief           Free a CBC-MAC context and underlying cipher sub-context
+ * \brief           Free a Retail Mac context and underlying cipher sub-context
  *
  * \param ctx       CBC-MAC context to free
  */
-void mbedtls_retailmac_free( mbedtls_retailmac_context *ctx );
+void mbedtls_retailmac_free( mbedtls_is9797_retail_mac_context *ctx );
 
-void mbedtls_retailmac_init( mbedtls_retailmac_context *ctx );
+/**
+ * \brief           Free a CBC Mac context and underlying cipher sub-context
+ *
+ * \param ctx       CBC-MAC context to free
+ */
+void mbedtls_cbcmac_free( mbedtls_is9797_cbc_mac_context *ctx );
 
-int mbedtls_retailmac_setkey( mbedtls_retailmac_context *ctx,
-                         const unsigned char key_1[8],
-						 const unsigned char key_2[8]);
 
-int mbedtls_cbcmac_alg3_generate( mbedtls_retailmac_context *ctx,
+int mbedtls_retailmac_setkey( mbedtls_is9797_retail_mac_context *ctx,
+		                 mbedtls_cipher_id_t cipher1_id,
+                         const unsigned char *key1,
+						 unsigned int key1_bits,
+						 mbedtls_cipher_id_t cipher2_id,
+						 const unsigned char *key2,
+						 unsigned int key2_bits
+						 );
+
+int mbedtls_cbcmac_setkey( mbedtls_is9797_cbc_mac_context *ctx,
+		                 mbedtls_cipher_id_t cipher_id,
+                         const unsigned char *key,
+						 unsigned int key_bits
+						 );
+
+
+int mbedtls_retailmac_generate( mbedtls_is9797_retail_mac_context *ctx,
+                           const unsigned char *input, size_t in_len,
+                           unsigned char* tag,  size_t tag_len);
+
+int mbedtls_cbc_mac_generate( mbedtls_is9797_cbc_mac_context *ctx,
+                           const unsigned char *input, size_t in_len,
+                           unsigned char* tag,  size_t tag_len);
+
+int mbedtls_retailmac_verify( mbedtls_is9797_retail_mac_context *ctx,
+                           const unsigned char *input, size_t in_len,
+                           unsigned char* tag,  size_t tag_len);
+
+
+int mbedtls_cbcmac_verify( mbedtls_is9797_cbc_mac_context *ctx,
                            const unsigned char *input, size_t in_len,
                            unsigned char* tag,  size_t tag_len);
 

@@ -51,7 +51,7 @@
 #include "mbedtls/ecp.h"
 #include "mbedtls/ecjpake.h"
 #include "mbedtls/timing.h"
-#include "mbedtls/retailmac.h"
+#include "../../include/mbedtls/iso9797mac.h"
 
 #include <string.h>
 
@@ -144,13 +144,13 @@ int main( int argc, char *argv[] )
 #if defined(MBEDTLS_SELF_TEST)
 
 
-#if defined(MBEDTLS_RETAILMAC_C) && defined(MBEDTLS_DES_C)
+#if defined(MBEDTLS_ISO9797MAC_C) && ( defined(MBEDTLS_DES_C) || defined(MBEDTLS_AES_C))
     if( mbedtls_retailmac_self_test( v )  != 0 )
     {
         suites_failed++;
     }
     suites_tested++;
-#endif /* defined(MBEDTLS_RETAILMAC_C) && defined(MBEDTLS_DES_C) */
+#endif /* defined(MBEDTLS_ISO9797MAC_C) && ( defined(MBEDTLS_DES_C) || defined(MBEDTLS_AES_C)) */
 
 #define SKIP_OTHER_TESTS
 #ifndef SKIP_OTHER_TESTS
